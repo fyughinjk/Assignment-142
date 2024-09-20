@@ -15,12 +15,20 @@ public class PlayerController : MonoBehaviour
     private float gravity;
     private Vector2 direction;
 
+    public LayerMask testLayerMask;
+
     // Start is called before the first frame update
     void Start()
     {
         cc = GetComponent<CharacterController>();
         gravity = Physics.gravity.y;
         InputManager.Instance.controller = this;
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (!focus) Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -52,6 +60,19 @@ public class PlayerController : MonoBehaviour
         desiredMoveDirection.y = YVel;
 
         cc.Move(desiredMoveDirection);
+
+        Vector3 startingPos = transform.position;
+        startingPos.y += 0.5f;
+
+        Ray ray = new Ray(startingPos, transform.forward);
+        RaycastHit hit;
+
+        Debug.DrawLine(startingPos, startingPos + (transform.forward * 10), Color.magenta);
+
+        if (Physics.Raycast(ray, out hit, 10f, testLayerMask))
+        {
+            Debug.Log(hit.collider.gameObject.name);
+        }
     }
 
    public void MoveStarted(InputAction.CallbackContext ctx)
